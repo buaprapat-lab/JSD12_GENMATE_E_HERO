@@ -96,8 +96,6 @@ class Mage extends Hero {
         `${this.name} has fallen in battle. There is no magic left to save her.`,
       );
     }
-  }
-}
 
 class Fighter extends Hero {
   constructor(name, gender, multiverse, hp, attack) {
@@ -151,7 +149,6 @@ class Assassin extends Hero {
       console.log(`${this.name} is currently hidden.`);
     }
   }
-}
 
 class Sharpshooter extends Hero {
   constructor(name, gender, multiverse, hp, attack, maxAmmo) {
