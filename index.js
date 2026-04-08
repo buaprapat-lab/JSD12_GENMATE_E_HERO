@@ -55,143 +55,165 @@ class IronTank {
         `${this.name} has no armor left! HP is reduced by ${power}. (HP: ${this.hp + power} -> ${this.hp})`,
       );
     }
-///// Magic ////
+    ///// Magic ////
 
-class Mage extends Hero {
-  constructor(name, gender, multiverse, hp, attack, mana) {
-    // เรียกใช้ constructor ของ Hero (Base Class)
-    super(name, gender, multiverse, hp, attack);
-    this.mana = mana; // พลังเวทมนตร์
-    this.hasResurrected = false; // ใช้เช็คว่าเคยชุบชีวิตไปหรือยัง (ชุบได้แค่ครั้งเดียว)
-  }
+    class Mage extends Hero {
+      constructor(name, gender, multiverse, hp, attack, mana) {
+        // เรียกใช้ constructor ของ Hero (Base Class)
+        super(name, gender, multiverse, hp, attack);
+        this.mana = mana; // พลังเวทมนตร์
+        this.hasResurrected = false; // ใช้เช็คว่าเคยชุบชีวิตไปหรือยัง (ชุบได้แค่ครั้งเดียว)
+      }
 
-  // Mage Specific Trait
-  castHeal() {
-    if (this.hp > 0) {
-      this.hp += 20;
-      console.log(
-        `${this.name} chants an ancient spell. HP restored to ${this.hp}.`,
-      );
+      // Mage Specific Trait
+      castHeal() {
+        if (this.hp > 0) {
+          this.hp += 20;
+          console.log(
+            `${this.name} chants an ancient spell. HP restored to ${this.hp}.`,
+          );
+        }
+      }
+
+      // Override gotattacked เพื่อใส่ Logic การคืนชีพ
+      gotattacked(attack) {
+        this.hp -= attack;
+        console.log(
+          `CRITICAL HIT! ${this.name} takes ${attack} damage. (Remaining HP: ${this.hp})`,
+        );
+
+        // Logic ชุบชีวิต (Resurrection)
+        if (this.hp <= 0 && !this.hasResurrected) {
+          console.log(`[System] Warning: Vital signs dropping...`);
+          console.log(
+            `[Ultimate] The Ray of Light pierces the sky! ${this.name} is reviving...`,
+          );
+          this.hp = 50; // ฟื้นคืนชีพกลับมามี HP ครึ่งหนึ่ง
+          this.hasResurrected = true; // ล็อคไว้ไม่ให้ชุบซ้ำ
+          console.log(
+            `${this.name} has returned from the void. HP is restored to ${this.hp}.`,
+          );
+        } else if (this.hp <= 0 && this.hasResurrected) {
+          console.log(
+            `${this.name} has fallen in battle. There is no magic left to save her.`,
+          );
+        }
+      }
     }
-  }
 
-  // Override gotattacked เพื่อใส่ Logic การคืนชีพ
-  gotattacked(attack) {
-    this.hp -= attack;
-    console.log(
-      `CRITICAL HIT! ${this.name} takes ${attack} damage. (Remaining HP: ${this.hp})`,
-    );
+    // --- DISPLAY / TEST RUN ---
 
-    // Logic ชุบชีวิต (Resurrection)
-    if (this.hp <= 0 && !this.hasResurrected) {
-      console.log(`[System] Warning: Vital signs dropping...`);
-      console.log(
-        `[Ultimate] The Ray of Light pierces the sky! ${this.name} is reviving...`,
-      );
-      this.hp = 50; // ฟื้นคืนชีพกลับมามี HP ครึ่งหนึ่ง
-      this.hasResurrected = true; // ล็อคไว้ไม่ให้ชุบซ้ำ
-      console.log(
-        `${this.name} has returned from the void. HP is restored to ${this.hp}.`,
-      );
-    } else if (this.hp <= 0 && this.hasResurrected) {
-      console.log(
-        `${this.name} has fallen in battle. There is no magic left to save her.`,
-      );
-    }
-  }
-}
+    const mage = new Mage("Nami", "Female", "Enchanted Forest", 80, 15, 100);
 
-// --- DISPLAY / TEST RUN ---
+    console.log("--- The Great War Begins ---");
+    mage.introduce();
 
-const mage = new Mage("Nami", "Female", "Enchanted Forest", 80, 15, 100);
+    console.log("--- Encounter with the Great Enemy: JavaScript");
+    mage.gotattacked(40); // โดนโจมตีครั้งแรก
 
-console.log("--- The Great War Begins ---");
-mage.introduce();
+    console.log("--- Facing a Fatal Blow ---");
+    mage.gotattacked(100); // โดนโจมตีหนักจน HP หมด (จะ Trigger Resurrection)
 
-console.log("--- Encounter with the Great Enemy: JavaScript");
-mage.gotattacked(40); // โดนโจมตีครั้งแรก
+    console.log("--- The Aftermath ---");
+    mage.statusNow();
 
-console.log("--- Facing a Fatal Blow ---");
-mage.gotattacked(100); // โดนโจมตีหนักจน HP หมด (จะ Trigger Resurrection)
-
-console.log("--- The Aftermath ---");
-mage.statusNow();
-
-class Fighter extends Hero {
-  constructor(name, gender, multiverse, hp, attack) {
-    super(name, gender, multiverse, hp, attack);
-  }
-    buffpower() {
+    class Fighter extends Hero {
+      constructor(name, gender, multiverse, hp, attack) {
+        super(name, gender, multiverse, hp, attack);
+      }
+      buffpower() {
         this.attack *= 2;
         this.hp += 10;
         console.log(`Hehe! Right now I'm buffed. My attack is twice! ${this.attack} attack Are you ready!!`);
         console.log(`I'm stronger now. My hp is ${this.hp}`)
-    }
-    debuffpower() {
+      }
+      debuffpower() {
         this.attack /= 2;
         console.log(`Oh no! my superpower has gone to half! just ${this.attack} attack`);
+      }
     }
-}
 
-class Assassin extends Hero {
-    constructor(name, gender, multiverse, hp, attack) {
+    class Assassin extends Hero {
+      constructor(name, gender, multiverse, hp, attack) {
         // เรียก constructor ของ Hero
         super(name, gender, multiverse, hp, attack);
-        
+
         // คุณสมบัติเฉพาะของ Assassin
         this.criticalChance = 0.4; // โอกาส 40% ที่จะโจมตีแรงขึ้น
         this.isHidden = false;     // สถานะพรางตัว
         this.evasionChance = 0.3;  // เพิ่มค่าโอกาสหลบหลีก (0.3 คือ 30%)
-    }
+      }
 
-    gotattacked(attack) {
+      gotattacked(attack) {
         // สุ่มตัวเลข 0 ถึง 1 ถ้าได้น้อยกว่าค่า evasionChance แปลว่าหลบได้
         const isEvaded = Math.random() < this.evasionChance;
 
         if (isEvaded) {
-            console.log(`[EVADE] ${this.name} Barely dodged the attack just in time! (Damage 0)`);
+          console.log(`[EVADE] ${this.name} Barely dodged the attack just in time! (Damage 0)`);
         } else {
-            // ถ้าหลบไม่ได้ ให้กลับไปใช้ลอจิกโดนดาเมจเดิมของ Hero (ใช้ super ช่วย)
-            super.gotattacked(attack);
+          // ถ้าหลบไม่ได้ ให้กลับไปใช้ลอจิกโดนดาเมจเดิมของ Hero (ใช้ super ช่วย)
+          super.gotattacked(attack);
         }
-    }
-    // สกิลเฉพาะ: พรางตัว
-    hideInShadows() {
+      }
+      // สกิลเฉพาะ: พรางตัว
+      hideInShadows() {
         this.isHidden = true;
         console.log(`${this.name} has vanished into the shadows! (Next attack will be deadly)`);
-    }
+      }
 
-    // Overriding: ปรับปรุงการโจมตีให้มีการคำนวณ Critical
-    attackEnemy(target) {
+      // Overriding: ปรับปรุงการโจมตีให้มีการคำนวณ Critical
+      attackEnemy(target) {
         let finalDamage = this.attack;
         let isCrit = Math.random() < this.criticalChance;
 
         if (this.isHidden) {
-            finalDamage *= 2.5; // ถ้าพรางตัวอยู่ โจมตีแรงขึ้น 2.5 เท่า
-            this.isHidden = false; // โจมตีแล้วหลุดจากสถานะพรางตัว
-            console.log("SURPRISE ATTACK!");
+          finalDamage *= 2.5; // ถ้าพรางตัวอยู่ โจมตีแรงขึ้น 2.5 เท่า
+          this.isHidden = false; // โจมตีแล้วหลุดจากสถานะพรางตัว
+          console.log("SURPRISE ATTACK!");
         } else if (isCrit) {
-            finalDamage *= 1.5; // โจมตีติดคริติคอลปกติแรงขึ้น 1.5 เท่า
-            console.log("CRITICAL HIT!");
+          finalDamage *= 1.5; // โจมตีติดคริติคอลปกติแรงขึ้น 1.5 เท่า
+          console.log("CRITICAL HIT!");
         }
 
         console.log(`${this.name} for ${finalDamage} damage!`);
 
-    }
+      }
 
-    // ปรับปรุงการแสดงสถานะให้ดูเท่ขึ้น
-    statusNow() {
+      // ปรับปรุงการแสดงสถานะให้ดูเท่ขึ้น
+      statusNow() {
         super.statusNow(); // เรียกใช้การเช็คตาย/เป็นจากคลาสแม่
         if (this.hp > 0 && this.isHidden) {
-            console.log(`${this.name} is currently hidden.`);
+          console.log(`${this.name} is currently hidden.`);
         }
+      }
     }
   }
-}
 
-const hero = new IronTank("Soldier Boy", 500, 100);
+  const hero = new IronTank("Soldier Boy", 500, 100);
 
 hero.receiveDamage(30);
 hero.receiveDamage(90);
 hero.receiveDamage(10);
 console.log(hero);
+
+
+
+  longRangeAttack() {
+
+    console.log(`${this.name}'s aiming from ${this.range} meters...`);
+
+    const isCritical = Math.random();
+    let damage = 50;
+
+    if (isCritical) {
+      console.log(`${this.name}, Target Hit! Damage dealt: ${damage}. ${this.hp} hp left.`);
+    } else {
+      console.log(`Fail to hit the target.`)
+    }
+  }
+}
+
+const sniper = new sharpshooter("sharpshooter", "Female", "Earth-199999", 80, 500);
+
+sniper.status();
+sniper.longRangeAttack();
