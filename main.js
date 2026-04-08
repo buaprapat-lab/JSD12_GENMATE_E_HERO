@@ -1,8 +1,9 @@
 import Mage from "./mage.js";
-import Fighter from "./fighter.js"
-import IronTank from "./tank.js"
-import Assassin from "./assasin.js"
-import Sharpshooter from "./sharpshooter.js"
+import Fighter from "./fighter.js";
+import IronTank from "./tank.js";
+import Assassin from "./assasin.js";
+import Sharpshooter from "./sharpshooter.js";
+import Hero from "./hero.js";
 
 
 const mage = new Mage("Nami", "Female", "Enchanted Forest", 80, 15, 100);
