@@ -30,17 +30,40 @@ class Hero {
   }
 }
 
-///// Magic ////
-
-class Mage extends Hero {
-  constructor(name, gender, multiverse, hp, attack, mana) {
-    // เรียกใช้ constructor ของ Hero (Base Class)
-    super(name, gender, multiverse, hp, attack);
-    this.mana = mana; // พลังเวทมนตร์
-    this.hasResurrected = false; // ใช้เช็คว่าเคยชุบชีวิตไปหรือยัง (ชุบได้แค่ครั้งเดียว)
+class IronTank {
+  constructor(name, hp, armor) {
+    this.name = name;
+    this.hp = hp;
+    this.armor = armor;
   }
 
-  // Mage Specific Trait
+  receiveDamage(power) {
+    if (this.armor > 0) {
+      const oldArmor = this.armor;
+      this.armor -= power;
+
+      if (this.armor < 0) {
+        this.hp += this.armor;
+        this.armor = 0;
+      }
+
+      console.log(
+        `${this.name} Use your ARMOR to absorb the damage! (Armor: ${oldArmor} -> ${this.armor})`,
+      );
+    } else {
+      this.hp -= power;
+      console.log(
+        `${this.name} has no armor left! HP is reduced by ${power}. (HP: ${this.hp + power} -> ${this.hp})`,
+      );
+    }
+  }
+}
+class Mage extends Hero {
+  constructor(name, gender, multiverse, hp, attack, mana) {
+    super(name, gender, multiverse, hp, attack);
+    this.mana = mana;
+    this.hasResurrected = false;
+  }
   castHeal() {
     if (this.hp > 0) {
       this.hp += 20;
@@ -49,22 +72,18 @@ class Mage extends Hero {
       );
     }
   }
-
-  // Override gotattacked เพื่อใส่ Logic การคืนชีพ
   gotattacked(attack) {
     this.hp -= attack;
     console.log(
       `CRITICAL HIT! ${this.name} takes ${attack} damage. (Remaining HP: ${this.hp})`,
     );
-
-    // Logic ชุบชีวิต (Resurrection)
     if (this.hp <= 0 && !this.hasResurrected) {
       console.log(`[System] Warning: Vital signs dropping...`);
       console.log(
         `[Ultimate] The Ray of Light pierces the sky! ${this.name} is reviving...`,
       );
-      this.hp = 50; // ฟื้นคืนชีพกลับมามี HP ครึ่งหนึ่ง
-      this.hasResurrected = true; // ล็อคไว้ไม่ให้ชุบซ้ำ
+      this.hp = 50;
+      this.hasResurrected = true;
       console.log(
         `${this.name} has returned from the void. HP is restored to ${this.hp}.`,
       );
@@ -96,32 +115,60 @@ class Fighter extends Hero {
   }
 }
 
-class Warrior extends Hero {
-  constructor(name, gender, multiverse, hp, attack, armor) {
+class Assassin extends Hero {
+  constructor(name, gender, multiverse, hp, attack) {
     super(name, gender, multiverse, hp, attack);
-    this.armor = armor;
+    this.criticalChance = 0.4;
+    this.isHidden = false;
+    this.evasionChance = 0.3;
   }
+
   gotattacked(attack) {
-    if (this.armor > 0) {
-      this.armor -= attack;
-      console.log("Your attack has 0 to me. I have a sheild");
-    } else {
-      this.hp -= attack;
+    const isEvaded = Math.random() < this.evasionChance;
+
+    if (isEvaded) {
       console.log(
-        "Oh no!"`I got attacked ${attack} hp. I currently have ${this.hp} hp.`,
+        `[EVADE] ${this.name} Barely dodged the attack just in time! (Damage 0)`,
       );
+    } else {
+      super.gotattacked(attack);
+    }
+  }
+  hideInShadows() {
+    this.isHidden = true;
+    console.log(
+      `${this.name} has vanished into the shadows! (Next attack will be deadly)`,
+    );
+  }
+
+  attackEnemy(target) {
+    let finalDamage = this.attack;
+    let isCrit = Math.random() < this.criticalChance;
+
+    if (this.isHidden) {
+      finalDamage *= 2.5;
+      this.isHidden = false;
+      console.log("SURPRISE ATTACK!");
+    } else if (isCrit) {
+      finalDamage *= 1.5;
+      console.log("CRITICAL HIT!");
+    }
+
+    console.log(`${this.name} for ${finalDamage} damage!`);
+  }
+  statusNow() {
+    super.statusNow();
+    if (this.hp > 0 && this.isHidden) {
+      console.log(`${this.name} is currently hidden.`);
     }
   }
 }
 
-// --- DISPLAY / TEST RUN ---
-
+//main
 const mage = new Mage("Nami", "Female", "Enchanted Forest", 80, 15, 100);
 const fighter = new Fighter("Marty", "Male", "Julong", 200, 100);
-console.log("--- The Great War Begins ---");
 mage.introduce();
 fighter.introduce();
-console.log("--- Encounter with the Great Enemy: JavaScript");
 mage.gotattacked(fighter.attack);
 fighter.gotattacked(mage.attack);
 mage.statusNow();
