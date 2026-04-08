@@ -20,7 +20,7 @@ class Hero {
         if (this.hp <= 0) {
             console.log("I'm dead");
         } else {
-            console.log(`I'm alive.I currently have ${this.hp} hp. `);
+            console.log(`I'm alive. I currently have ${this.hp} hp. `);
         } 
     }
 }
